@@ -1,5 +1,3 @@
-"""Демонстрация готовой модели качества вина; обучение выполняется в ноутбуке."""
-
 import json
 from pathlib import Path
 
@@ -29,7 +27,6 @@ FEATURE_LABELS = {
 
 @st.cache_resource(show_spinner=False)
 def load_model(path, file_version):
-    # Один объект модели на сервер: при rerun повторная десериализация не нужна.
     return joblib.load(path)
 
 
@@ -45,13 +42,10 @@ def load_config(path, file_version):
 
 @st.cache_data(show_spinner=False)
 def test_proba(_model, X, model_version):
-    # Порог не входит в ключ кэша: при его изменении вероятности не пересчитываются.
-    # Версия файла инвалидирует кэш, если сохранённая модель была заменена.
     return _model.predict_proba(X)[:, 1]
 
 
 def validate_features(table, feature_names):
-    """Проверить CSV и вернуть числовые признаки в порядке обучения модели."""
     missing = [name for name in feature_names if name not in table.columns]
     if missing:
         raise ValueError("В CSV не хватает столбцов: " + ", ".join(missing))
